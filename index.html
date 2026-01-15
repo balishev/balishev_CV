@@ -1,0 +1,295 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artem Balyshev - CV Landing Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .contact {
+            margin-top: 10px;
+        }
+        .contact p {
+            margin: 5px 0;
+        }
+        section {
+            margin-top: 30px;
+        }
+        h2 {
+            color: #ff6600;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .sub-list {
+            margin-left: 20px;
+        }
+        .qr-codes {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .qr-codes div {
+            text-align: center;
+        }
+        .qr-codes img {
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: transform 0.2s ease;
+        }
+        
+        .qr-codes img:hover {
+            transform: scale(1.05);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .language-switcher {
+            text-align: right;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
+        .lang-btn {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            margin-left: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .lang-btn.active {
+            background-color: #ff6600;
+            color: white;
+            border-color: #ff6600;
+        }
+        .lang-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .lang-ru {
+            display: none;
+        }
+        .lang-en {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-switcher">
+            <button class="lang-btn" data-lang="en">EN</button>
+            <button class="lang-btn active" data-lang="ru">RU</button>
+        </div>
+        <header>
+            <h1><span class="lang-en">Artem Balyshev</span><span class="lang-ru">Артем Балышев</span></h1>
+            <div class="contact">
+                <p><span class="lang-en">Moscow, Russia</span><span class="lang-ru">Москва, Россия</span></p>
+                <p><span class="lang-en">Phone: (+7) (922) 296-56-17</span><span class="lang-ru">Телефон: (+7) (922) 296-56-17</span></p>
+                <p>Email: <a href="mailto:balishev.artm@mail.ru">balishev.artm@mail.ru</a> | <a href="mailto:balishev.artm@gmail.com">balishev.artm@gmail.com</a></p>
+                <p>GitHub: <a href="https://github.com/balishev">@balishev</a></p>
+            </div>
+            <p><span class="lang-en">Business informatics, consulting, software development, or economics, leveraging programming, design, and analytical skills to address business challenges.</span><span class="lang-ru">Бизнес-информатика, консалтинг, разработка программного обеспечения, экономика, использую навыки программирования, дизайна и аналитики для решения бизнес-задач.</span></p>
+        </header>
+
+        <section id="competencies">
+            <h2><span class="lang-en">Key Competencies</span><span class="lang-ru">Ключевые компетенции</span></h2>
+            <ul>
+                <li><strong><span class="lang-en">Programming:</span><span class="lang-ru">Программирование:</span></strong> Python, JavaScript</li>
+                <li><strong><span class="lang-en">Design:</span><span class="lang-ru">Дизайн:</span></strong> UI/UX, interface prototyping</li>
+                <li><strong><span class="lang-en">Economics:</span><span class="lang-ru">Экономика:</span></strong> Микро- и макроэкономика, бизнес-аналитика</li>
+                <li><strong><span class="lang-en">Management:</span><span class="lang-ru">Управление:</span></strong> Project management, командная работа</li>
+                <li><strong><span class="lang-en">Languages:</span><span class="lang-ru">Языки:</span></strong> Русский (родной), Английский (C1)</li>
+            </ul>
+        </section>
+
+        <section id="education">
+            <h2><span class="lang-en">Education</span><span class="lang-ru">Образование</span></h2>
+            <p><strong><span class="lang-en">Central University, Moscow</span><span class="lang-ru">Центральный университет, Москва</span></strong><br>
+            <span class="lang-en">Bachelor’s Degree, Business Informatics</span><span class="lang-ru">Бакалавр, Бизнес-информатика</span><br>
+            <span class="lang-en">2025 – 2029 (expected graduation)</span><span class="lang-ru">2025 – 2029 (ожидаемое окончание)</span></p>
+            <ul class="sub-list">
+                <li><span class="lang-en">Member of the student team for business, economics, and finance</span><span class="lang-ru">Участник студенческой сборной по бизнесу, экономике и финансам</span></li>
+                <li><span class="lang-en">Active participant in case competitions and economics Olympiads</span><span class="lang-ru">Активный участник кейс-чемпионатов и экономических олимпиад</span></li>
+            </ul>
+        </section>
+
+        <section id="achievements">
+            <h2><span class="lang-en">Achievements</span><span class="lang-ru">Достижения</span></h2>
+            <h3><span class="lang-en">Olympiads</span><span class="lang-ru">Олимпиады</span></h3>
+            <ul class="sub-list">
+                <li><span class="lang-en">Prize-winner, Regional Stage of the All-Russian Olympiad for School Students in Social Studies (2024)</span><span class="lang-ru">Призёр, Региональный этап Всероссийской олимпиады школьников по обществознанию (2024)</span></li>
+            </ul>
+            <h3><span class="lang-en">Case Competitions</span><span class="lang-ru">Кейс-чемпионаты</span></h3>
+            <ul class="sub-list">
+                <li><span class="lang-en">2nd Place, UBRD Bank Case, INNOHACK’25 Hackathon (INNOPROM, 2025)</span><span class="lang-ru">2 место, кейс банка УБРиР, хакатон INNOHACK’25 (ИННОПРОМ, 2025)</span></li>
+                <li><span class="lang-en">Winner, T-Bank and ITMO Hackathon “Startup in 10 Hours” (2023)</span><span class="lang-ru">Победитель, хакатон Т-Банк и ИТМО «Стартап за 10 часов» (2023)</span></li>
+                <li><span class="lang-en">Finalist, DEADLINE 2025 All-Russian Case Championship</span><span class="lang-ru">Финалист, Всероссийский кейс-чемпионат DEADLINE 2025</span></li>
+                <li><span class="lang-en">Finalist, IV International Construction Championship (100+ TechnoBuild, 2025)</span><span class="lang-ru">Финалист, IV Международный строительный чемпионат (100+ TechnoBuild, 2025)</span></li>
+                <li><span class="lang-en">Prize-winner, Regional School Students’ Case Championship in Economics and Entrepreneurship, Ekaterinburg (2024)</span><span class="lang-ru">Призёр, Региональный кейс-чемпионат школьников по экономике и предпринимательству, Екатеринбург (2024)</span></li>
+            </ul>
+        </section>
+
+        <section id="experience">
+            <h2><span class="lang-en">Experience</span><span class="lang-ru">Опыт работы</span></h2>
+            <p><strong><span class="lang-en">SESC UrFU – Rock Festival for schoolchildren, Yekaterinburg</span><span class="lang-ru">СУНЦ УрФУ – Рок-Фестиваль для школьников, Екатеринбург</span></strong><br>
+            <span class="lang-en">Winter 2024</span><span class="lang-ru">Зима 2024</span></p>
+            <ul class="sub-list">
+                <li><span class="lang-en">About 1,000 participants and guests</span><span class="lang-ru">Около 1000 участников и гостей</span></li>
+                <li><span class="lang-en">Found partners and formed the budget of the event</span><span class="lang-ru">Нашел партнеров и сформировал бюджет мероприятия</span></li>
+                <li><span class="lang-en">Organized interaction with artists</span><span class="lang-ru">Организовал взаимодействие с артистами</span></li>
+                <li><span class="lang-en">Organized the work of photographers and videographers at the event, released a series of interviews with the jury members and participants of the festival</span><span class="lang-ru">Организовал работу фотографов и видеографов на мероприятии, выпустили серию интервью с членами жюри и участниками фестиваля</span></li>
+
+            </ul>
+            <p><strong><span class="lang-en">Student Projects, Central University</span><span class="lang-ru">Студенческие проекты, Центральный университет</span></strong><br>
+            <span class="lang-en">2025 – Present</span><span class="lang-ru">2025 – настоящее время</span></p>
+            <ul class="sub-list">
+                <li><span class="lang-en">Developed web applications using JavaScript for business cases</span><span class="lang-ru">Разрабатывал веб-приложения на JavaScript для бизнес-кейсов</span></li>
+                <li><span class="lang-en">Conducted data analysis and visualization using Python</span><span class="lang-ru">Проводил анализ данных и визуализацию с использованием Python</span></li>
+                <li><span class="lang-en">Optimized business processes in team projects</span><span class="lang-ru">Оптимизировал бизнес-процессы в командных проектах</span></li>
+            </ul>
+            <p><strong><span class="lang-en">Audit, online courses at a major Moscow university</span><span class="lang-ru">Аудит, онлайн-курсы в крупном московском вузе</span></strong><br>
+            <span class="lang-en">Autumn-winter 2025</span><span class="lang-ru">Осень-зима 2025</span></p>
+            <ul class="sub-list">
+                <li><span class="lang-en">Conducted an audit and identified the reasons for the low level of sales</span><span class="lang-ru">Провёл аудит и выявил причины низкого уровня продаж</span></li>
+                <li><span class="lang-en">I have created a list of suggestions for solving the problem</span><span class="lang-ru">Создал список предложений по решению проблемы</span></li>
+                <li><span class="lang-en">I have consulted on optimization with AI for the university management</span><span class="lang-ru">Консультировал руководство вуза по оптимизации с использованием ИИ</span></li>
+            </ul>
+            <p><strong>Pulsetech.su</strong><br>
+            <span class="lang-en">2025 – Present</span><span class="lang-ru">2025 – настоящее время</span></p>
+            <ul class="sub-list">
+                <li><span class="lang-en">Startup founder</span><span class="lang-ru">Основатель стартапа</span></li>
+                <li><span class="lang-en">We have completed many automation projects successfully</span><span class="lang-ru">Успешно завершили множество проектов по автоматизации</span></li>
+            </ul>
+        </section>
+
+        <section id="additional">
+            <h2><span class="lang-en">Additional Information</span><span class="lang-ru">Дополнительная информация</span></h2>
+            <ul>
+                <li><strong><span class="lang-en">Interests:</span><span class="lang-ru">Интересы:</span></strong> IT, economics, hackathons, professional literature, reportage photography</li>
+                <li><strong><span class="lang-en">References</span><span class="lang-ru">Рекомендации</span></strong> <span class="lang-en">available upon request</span><span class="lang-ru">предоставляются по запросу</span></li>
+            </ul>
+            <div class="qr-codes">
+                <div>
+                    <a href="https://github.com/balishev">
+                        <img src="git_qr.png" alt="GitHub QR Code" width="150" height="150">
+                    </a>
+                    <p>GitHub: <a href="https://github.com/balishev">@balishev</a></p>
+                </div>
+                <div>
+                    <a href="https://t.me/d5f3e90a">
+                        <img src="tg_qr.png" alt="Telegram QR Code" width="150" height="150">
+                    </a>
+                    <p>Telegram: <a href="https://t.me/d5f3e90a">@d5f3e90a</a></p>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langButtons = document.querySelectorAll('.lang-btn');
+            const switchLanguage = (lang) => {
+                // Update button active state
+                langButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+                // Show/hide language spans
+                document.querySelectorAll('.lang-en').forEach(el => {
+                    el.style.display = lang === 'en' ? 'inline' : 'none';
+                });
+                document.querySelectorAll('.lang-ru').forEach(el => {
+                    el.style.display = lang === 'ru' ? 'inline' : 'none';
+                });
+                // Update html lang attribute
+                document.documentElement.lang = lang;
+            };
+
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchLanguage(btn.dataset.lang);
+                });
+            });
+
+            // Initialize language based on active button
+            const activeBtn = document.querySelector('.lang-btn.active');
+            if (activeBtn) {
+                switchLanguage(activeBtn.dataset.lang);
+            }
+        });
+    </script>
+</body>
+</html>
